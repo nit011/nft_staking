@@ -26,9 +26,9 @@
 
 ## Notes
 
-- The contract uses the IERC721Enumerable interface to access the tokenOfOwnerByIndex function, which allows iterating through all NFTs owned by a user.
-- The contract is upgradeable using OpenZeppelin's UUPS (Universal Upgradeable Proxy Standard) pattern.
-- The contract uses OpenZeppelin's Pausable, Ownable, and ReentrancyGuard libraries to provide additional security and administrative functionalities.
+- In this contract i use the IERC721Enumerable interface to access the tokenOfOwnerByIndex function, which allows iterating through all NFTs owned by a user.
+- This contract is upgradeable using OpenZeppelin's UUPS (Universal Upgradeable Proxy Standard) pattern.
+- This  contract uses OpenZeppelin's Pausable, Ownable, and ReentrancyGuard libraries to provide additional security and administrative functionalities.
 
 
 ## Foundry
