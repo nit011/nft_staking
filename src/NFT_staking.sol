@@ -216,7 +216,8 @@ contract NFTStaking is  UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable
      * @dev Only the owner can update the reward rate.
      * @param newRewardRate The new reward rate.
      */
-    function setRewardRate(uint256 newRewardRate) external onlyOwner {
+     function setRewardRate(uint256 newRewardRate) external onlyOwner {
+        _updateRewardDebts();
         rewardRate = newRewardRate;
         emit RewardRateUpdated(newRewardRate);
     }
@@ -274,6 +275,21 @@ contract NFTStaking is  UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable
             }
         }
         return totalRewards;
+    }
+
+     /**
+     * @dev Updates the reward debts for all staked NFTs.
+     */
+    function _updateRewardDebts() internal {
+        for (uint256 i = 0; i < nft.totalSupply(); i++) {
+            address owner = nft.ownerOf(i);
+            if (stakedTokens[owner][i]) {
+                StakeInfo storage stake = stakes[owner][i];
+                uint256 stakedDuration = block.number - stake.stakedAt;
+                uint256 reward = stakedDuration * rewardRate - stake.rewardDebt;
+                stake.rewardDebt += reward;
+            }
+        }
     }
 
 
