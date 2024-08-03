@@ -24,7 +24,6 @@ contract NFTStakingTest is StdCheats, Test {
         DeployNFTStaking deployer = new DeployNFTStaking();
         nftStaking = deployer.run();
 
-        
         nft = IERC721Enumerable(nftStaking.nft());
         rewardToken = IERC20(nftStaking.rewardToken());
 
@@ -57,7 +56,7 @@ contract NFTStakingTest is StdCheats, Test {
         assert(unbonding);
     }
 
-       function testWithdrawNFT() public {
+    function testWithdrawNFT() public {
         vm.startPrank(USER);
         nft.approve(address(nftStaking), TOKEN_ID);
         uint256[] memory tokenIds = new uint256[](1);
@@ -71,8 +70,6 @@ contract NFTStakingTest is StdCheats, Test {
         (uint256 stakedAt, , , ) = nftStaking.stakes(USER, TOKEN_ID);
         assert(stakedAt == 0);
     }
-
-
 
     function testClaimRewards() public {
         vm.startPrank(USER);
@@ -108,9 +105,24 @@ contract NFTStakingTest is StdCheats, Test {
     }
 
     function testUpdateRewardRate() public {
+        vm.startPrank(USER);
+        nft.approve(address(nftStaking), TOKEN_ID);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = TOKEN_ID;
+        nftStaking.stakeNFT(tokenIds);
+        vm.warp(block.timestamp + 1 days);
+
+        uint256 oldRewardRate = nftStaking.rewardRate();
         uint256 newRewardRate = 20;
         nftStaking.setRewardRate(newRewardRate);
-        assert(nftStaking.rewardRate() == newRewardRate);
+        vm.warp(block.timestamp + 1 days); 
+
+        nftStaking.claimRewards();
+        vm.stopPrank();
+
+        uint256 rewardBalance = rewardToken.balanceOf(USER);
+        uint256 expectedReward = 1 days * oldRewardRate + 1 days * newRewardRate;
+        assert(rewardBalance == expectedReward);
     }
 
     function testUpdateUnbondingPeriod() public {
